@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+<div class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
+  <h2 class="text-xl font-bold mb-4">Book Management</h2>
+
+  <form id="bookForm" class="mb-4">
+    <input type="hidden" id="bookId">
+    <input type="text" id="bookTitle" placeholder="Book Title" class="w-full p-2 border rounded mb-2" required>
+    <input type="text" id="bookAuthor" placeholder="Author" class="w-full p-2 border rounded mb-2" required>
+    <input type="number" id="bookPrice" placeholder="Price" class="w-full p-2 border rounded mb-2" required>
+    <input type="text" id="bookImageUrl" placeholder="Image URL" class="w-full p-2 border rounded mb-2" required>
+    <div class="flex space-x-2">
+      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Save Book</button>
+      <button type="button" onclick="updateBook()" class="bg-green-500 text-white px-4 py-2 rounded">Update Book</button>
+    </div>
+  </form>
+
+  <ul id="bookList" class="space-y-4"></ul>
+</div>
+
+<script>
+  const apiUrl = 'http://localhost:8080/books';
+  const bookForm = document.getElementById('bookForm');
+  const bookList = document.getElementById('bookList');
+
+  async function fetchBooks() {
+      const response = await fetch(apiUrl);
+      const books = await response.json();
+      bookList.innerHTML = '';
+      books.forEach(book => {
+          const li = document.createElement('li');
+          li.classList = "p-4 bg-gray-200 rounded flex items-center space-x-4";
+          li.innerHTML = `
+              <img src="${book.imageUrl}" alt="Book Image" class="w-20 h-20 object-cover rounded">
+              <div>
+                  <p class="font-bold">${book.title} by ${book.author}</p>
+                  <p class="text-gray-600">Price: $${book.price}</p>
+                  <span>
+                      <button onclick="editBook(${book.id}, '${book.title}', '${book.author}', ${book.price}, '${book.imageUrl}')" class="text-blue-500">Edit</button>
+                      <button onclick="deleteBook(${book.id}, '${book.title}', '${book.author}', ${book.price}, '${book.imageUrl}')" class="text-red-500">Delete</button>
+                  </span>
+              </div>
+          `;
+          bookList.appendChild(li);
+      });
+  }
+
+  bookForm.addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const title = document.getElementById('bookTitle').value;
+      const author = document.getElementById('bookAuthor').value;
+      const price = document.getElementById('bookPrice').value;
+      const imageUrl = document.getElementById('bookImageUrl').value;
+
+      const bookData = { title, author, price, imageUrl };
+
+      await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(bookData)
+      });
+      bookForm.reset();
+      fetchBooks();
+  });
+
+  async function updateBook() {
+      const id = document.getElementById('bookId').value;
+      if (!id) return;
+
+      const title = document.getElementById('bookTitle').value;
+      const author = document.getElementById('bookAuthor').value;
+      const price = document.getElementById('bookPrice').value;
+      const imageUrl = document.getElementById('bookImageUrl').value;
+
+      const bookData = { id, title, author, price, imageUrl };
+
+      await fetch(`${apiUrl}/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(bookData)
+      });
+      bookForm.reset();
+      fetchBooks();
+  }
+
+  async function deleteBook(id, title, author, price, imageUrl) {
+      try {
+          const bookData = { id, title, author, price, imageUrl };
+          const response = await fetch(`${apiUrl}/${id}`, {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(bookData)
+          });
+
+          if (!response.ok) {
+              throw new Error('Failed to delete book');
+          }
+
+          fetchBooks();
+      } catch (error) {
+          console.error('Error deleting book:', error);
+      }
+  }
+
+  function editBook(id, title, author, price, imageUrl) {
+      document.getElementById('bookId').value = id;
+      document.getElementById('bookTitle').value = title;
+      document.getElementById('bookAuthor').value = author;
+      document.getElementById('bookPrice').value = price;
+      document.getElementById('bookImageUrl').value = imageUrl;
+  }
+
+  fetchBooks();
+</script>
+</body>
+</html>
