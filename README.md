@@ -35,3 +35,5 @@ The **BookStor Application** is a simple CRUD (Create, Read, Update, Delete) web
 2. **Update a Book**: Click `Edit` next to a book, modify the fields, and click `Update Book`.
 3. **Delete a Book**: Click `Delete` next to a book.
 
+
+
