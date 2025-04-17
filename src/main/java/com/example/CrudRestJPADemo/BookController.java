@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-public class BookController {
+public class BookController{
 
     @Autowired
     BookRepository bookRepository;
