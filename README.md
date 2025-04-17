@@ -1,4 +1,4 @@
-# BookStore Application
+# BookStore Application 
 
 ## Overview
 The **BookStor Application** is a simple CRUD (Create, Read, Update, Delete) web application built using **Spring Boot, JPA (Java Persistence API), and a RESTful API** for the backend, and **HTML, Tailwind CSS, and JavaScript** for the frontend. This project enables users to add, edit, delete, and view books.
